@@ -1,0 +1,44 @@
+@media (max-width: 1024px) {
+  .admin-layout { grid-template-columns:220px minmax(0,1fr); }
+  .admin-sidebar { width:220px; padding:1.4rem 1rem; }
+  .admin-content { padding:2rem; }
+  .overview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .social-fields { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+@media (max-width: 800px) {
+  .admin-layout { display:block; min-width:0; }
+  .admin-sidebar { position:sticky; top:0; z-index:100; width:100%; height:auto; max-height:none; padding:.8rem 1rem; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:.75rem; border-right:0; border-bottom:1px solid rgba(255,255,255,.1); }
+  .admin-sidebar .admin-brand { font-size:1.35rem; }
+  .admin-sidebar>p { display:none; }
+  .admin-sidebar nav { display:flex; min-width:0; margin:0; padding:.15rem 0 .35rem; gap:.3rem; overflow-x:auto; overscroll-behavior-inline:contain; scrollbar-width:thin; }
+  .admin-sidebar nav a { flex:0 0 auto; min-height:40px; display:flex; align-items:center; padding:.58rem .75rem; white-space:nowrap; }
+  .admin-sidebar .logout { margin:0; min-height:40px; padding:.55rem .7rem; border:1px solid rgba(255,255,255,.12); border-radius:9px; white-space:nowrap; }
+  .admin-content { padding:1.25rem; }
+  .admin-header { align-items:center; gap:1rem; margin-bottom:1.25rem; }
+  .admin-header h1 { margin-bottom:.35rem; font-size:clamp(2.1rem,9vw,3.5rem); overflow-wrap:anywhere; }
+  .admin-header>a { flex:0 0 auto; }
+  .overview-grid,.form-grid,.social-fields { grid-template-columns:1fr; }
+  .overview-grid article { min-height:135px; }
+  .form-grid .wide { grid-column:auto; }
+  .content-form { padding:1.15rem; }
+  .admin-list article { align-items:stretch; flex-direction:column; }
+  .admin-list article>div:last-child { flex-wrap:wrap; }
+  .admin-list button { min-height:40px; }
+}
+
+@media (max-width: 520px) {
+  .admin-sidebar { grid-template-columns:auto 1fr; }
+  .admin-sidebar nav { grid-column:1/-1; grid-row:2; order:3; }
+  .admin-sidebar .logout { grid-column:2; grid-row:1; justify-self:end; }
+  .admin-content { padding:1rem; }
+  .admin-header { align-items:flex-start; flex-direction:column; }
+  .admin-header>a { width:100%; text-align:center; }
+  .content-form { margin-inline:-.15rem; padding:1rem; border-radius:13px; }
+  .content-form input,.content-form textarea,.content-form select { width:100%; min-width:0; }
+  .form-actions { align-items:stretch; flex-direction:column; }
+  .form-actions button { width:100%; min-height:44px; }
+  .social-field { padding:.9rem; }
+  .section-toggles { align-items:flex-start; flex-direction:column; }
+  .admin-list article>div:last-child button { flex:1 1 auto; }
+}
