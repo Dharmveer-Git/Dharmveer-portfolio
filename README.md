@@ -14,8 +14,8 @@ React/Vite portfolio with an Express API, MongoDB Atlas persistence, JWT-protect
    ```
 
    Use `npm run frontend` or `npm run server` only when you want to run one
-   side separately. `npm start` is the production command; it builds the
-   frontend before starting the server.
+   side separately. For production, run `npm run build` once, then `npm start`.
+   The server serves the built frontend from `client/dist`.
 
 Portfolio: http://localhost:5173  
 Admin login: http://localhost:5173/admin/login  
@@ -38,6 +38,8 @@ quick guide to where each type of change belongs.
 GET content routes are public. Content mutations, uploads, admin routes, and message management require a Bearer JWT.
 
 ## Before deployment
+
+See [HOSTINGER_DEPLOY.md](./HOSTINGER_DEPLOY.md) for the full-stack ZIP deployment settings.
 
 - Replace `client/public/profile.jpg`, `client/public/resume.pdf`, and `client/public/favicon.ico` with real files.
 - Replace sample project, education, certificate, experience, and social data from the admin dashboard.

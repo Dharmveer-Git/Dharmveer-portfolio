@@ -130,3 +130,11 @@
 .overview-grid article a { font-size:.8rem; }
 .admin-menu-toggle { display:none; }
 @media(max-width:760px) { .admin-menu-toggle { display:block; } .admin-sidebar nav:not(.is-open) { display:none; } .admin-sidebar nav.is-open { display:flex; flex-wrap:wrap; grid-column:1/-1; } }
+
+@media(max-width:600px) {
+  .admin-login { padding:24px 16px; }
+  .admin-login form { padding:28px 22px; min-width:0; }
+  .admin-login input { width:100%; min-width:0; font-size:1rem; min-height:48px; }
+  .admin-login button { min-height:48px; }
+  .admin-login h1 { font-size:clamp(2.2rem,10vw,3rem); }
+}

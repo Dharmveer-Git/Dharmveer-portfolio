@@ -1,6 +1,21 @@
+function collectErrors(error, seen = new Set()) {
+  if (!error || seen.has(error)) return []
+  seen.add(error)
+  return [error, ...[error.cause,
+    ...Array.from(error.reason?.servers?.values?.() || [], (server) => server.error),
+  ].flatMap((nested) => collectErrors(nested, seen))]
+}
+
+export function isConnectionReset(error) {
+  return collectErrors(error).some((item) => item.code === 'ECONNRESET' || /\bECONNRESET\b/.test(item.message || ''))
+}
+
 export function databaseErrorHint(error) {
-  const errors = [error, error?.cause, ...Array.from(error?.reason?.servers?.values?.() || [], (server) => server.error)]
+  const errors = collectErrors(error)
   const details = errors.map((item) => `${item?.code || ''} ${item?.message || ''}`).join(' ')
+  if (isConnectionReset(error)) {
+    return 'MongoDB connection reset (ECONNRESET). Check Atlas Network Access for your machine or hosting server outbound public IP, cluster availability, outbound port 27017, VPN/firewall filtering, and database connection limits. Keep TLS certificate validation enabled.'
+  }
   if (/querySrv|queryTxt|ENOTFOUND|EAI_AGAIN|ECONNREFUSED.*_mongodb/i.test(details)) {
     return 'MongoDB DNS lookup failed. Check your DNS/network connection and MONGODB_DNS_SERVERS if configured.'
   }

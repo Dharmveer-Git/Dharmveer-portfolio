@@ -1,12 +1,21 @@
 import 'dotenv/config'
-import connectDB from './server/config/db.js'
+import connectDB, { disconnectDB } from './server/config/db.js'
 import { databaseErrorHint } from './server/config/database-error.js'
+import { startServer } from './server/index.js'
 
-try {
-  await connectDB()
-} catch (error) {
-  console.error(databaseErrorHint(error))
-  console.error('Run npm run db:check after correcting the connection settings.')
-  process.exit(1)
+async function main() {
+  try {
+    await connectDB()
+  } catch (error) {
+    console.error(databaseErrorHint(error))
+    console.error('Run npm run db:check after correcting the connection settings.')
+    process.exit(1)
+  }
+  await startServer()
 }
-await import('./server/index.js')
+
+main().catch(async (error) => {
+  console.error('Application startup failed:', error.message)
+  await disconnectDB().catch(() => {})
+  process.exit(1)
+})

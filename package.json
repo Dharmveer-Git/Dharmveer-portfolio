@@ -3,11 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "server.js",
   "engines": {
     "node": ">=20 <25"
   },
   "scripts": {
-    "start": "npm run build && node server.js",
+    "start": "node server.js",
     "dev": "node scripts/dev.js",
     "server:dev": "node scripts/dev.js --api-only",
     "frontend": "vite client",

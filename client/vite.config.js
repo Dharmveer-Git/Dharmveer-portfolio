@@ -1,15 +1,21 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath } from 'node:url'
 
-// https://vite.dev/config/
-export default defineConfig({
-  // Environment variables live in the project root, one level above /client.
-  envDir: '..',
-  plugins: [react()],
-  server: {
-    proxy: {
-      '/api': 'http://localhost:5001',
-      '/uploads': 'http://localhost:5001',
+const projectRoot = fileURLToPath(new URL('../', import.meta.url))
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, projectRoot, '')
+  const port = Number(process.env.PORT || env.PORT) || 5001
+  const target = `http://127.0.0.1:${port}`
+  return {
+    envDir: projectRoot,
+    plugins: [react()],
+    server: {
+      proxy: {
+        '/api': target,
+        '/uploads': target,
+      },
     },
-  },
+  }
 })

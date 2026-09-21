@@ -7,7 +7,7 @@ import { MongoClient } from 'mongodb'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { configureDatabaseDns } from '../server/config/dns.js'
 
-configureDatabaseDns()
+const dnsOptions = configureDatabaseDns()
 
 const rootDirectory = process.cwd()
 const viteCli = path.join(rootDirectory, 'node_modules', 'vite', 'bin', 'vite.js')
@@ -37,6 +37,7 @@ const canConnectToMongo = async (uri) => {
 
   try {
     client = new MongoClient(uri, {
+      ...dnsOptions,
       connectTimeoutMS: 5_000,
       serverSelectionTimeoutMS: 5_000,
       maxPoolSize: 1,

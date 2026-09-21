@@ -61,3 +61,22 @@
   .admin-layout .form-actions button { flex:1 1 auto; }
 }
 @media(prefers-reduced-motion:reduce) { .admin-layout * { scroll-behavior:auto !important; transition:none !important; } }
+
+/* Narrow screens and touch keyboards must not clip editor controls. */
+@media(max-width:800px) {
+  .admin-layout .admin-sidebar nav a { white-space:normal; overflow-wrap:anywhere; }
+  .admin-layout .admin-sidebar nav.is-open { max-height:calc(100dvh - 110px); overscroll-behavior:contain; }
+  .admin-layout .content-form :is(input,textarea,select),
+  .admin-layout .saved-content-heading input { font-size:1rem; }
+  .admin-layout .admin-media-preview img { max-width:100%; }
+  .admin-layout .admin-header { flex-wrap:wrap; }
+  .admin-layout .admin-header>div { min-width:0; }
+  .admin-layout .admin-list article>div:last-child { gap:8px; }
+}
+@media(max-width:400px) {
+  .admin-layout .admin-sidebar { gap:10px; padding:14px 12px; }
+  .admin-layout .admin-sidebar nav.is-open { grid-template-columns:minmax(0,1fr); }
+  .admin-layout .admin-menu-toggle { padding-inline:12px; }
+  .admin-layout .content-form { padding:16px; margin-inline:0; }
+  .admin-layout .overview-grid { grid-template-columns:minmax(0,1fr); }
+}
