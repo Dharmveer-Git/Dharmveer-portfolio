@@ -21,3 +21,18 @@ test('handles circular causes', () => {
   assert.equal(isConnectionReset(error), false)
   assert.match(databaseErrorHint(error), /DNS lookup failed/)
 })
+
+test('missing production URI gives configuration instructions', () => {
+  assert.match(databaseErrorHint(new Error('MONGODB_URI is required.')), /MONGODB_URI is missing.*Hostinger/)
+})
+
+test('invalid URI diagnostics do not expose supplied credentials', () => {
+  const hint = databaseErrorHint({ name: 'MongoParseError', message: 'Invalid scheme mongodb+srv://user:private-password@host' })
+  assert.match(hint, /MONGODB_URI is invalid/)
+  assert.doesNotMatch(hint, /private-password/)
+})
+
+test('connection timeout and refusal get distinct diagnostics', () => {
+  assert.match(databaseErrorHint({ cause: { code: 'ETIMEDOUT' } }), /connection timed out/)
+  assert.match(databaseErrorHint({ cause: { code: 'ECONNREFUSED' } }), /refused the connection/)
+})
