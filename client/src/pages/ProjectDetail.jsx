@@ -38,14 +38,19 @@ function ProjectContent({ slug }) {
         <h1>{project.title}</h1>
         <div className="project-links">{project.liveUrl ? <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">Live Demo <Arrow /></a> : null}{project.githubUrl ? <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">GitHub <Arrow /></a> : null}</div>
       </header>
-      {project.image ? <figure className="case-image"><img src={project.image} alt={`${project.title} screenshot`} /></figure> : null}
+      {project.image ? <figure className="case-image"><img src={project.image} alt={`${project.title} screenshot`} decoding="async" /></figure> : null}
       <section className="case-overview" aria-labelledby="overview-title"><h2 id="overview-title">Overview</h2><p>{project.description}</p></section>
       <div className="case-grid">
         {project.meta?.problem ? <section><h2>The problem</h2><p>{project.meta.problem}</p></section> : null}
-        {project.meta?.solution ? <section><h2>The solution</h2><p>{project.meta.solution}</p></section> : null}
+        {project.meta?.solution ? <section><h2>Implementation & approach</h2><p>{project.meta.solution}</p></section> : null}
         {project.tags?.length ? <section><h2>Tech stack</h2><ul className="case-tags">{project.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul></section> : null}
-        {project.features?.length ? <section><h2>Key features</h2><ul>{project.features.map((feature) => <li key={feature}>{feature}</li>)}</ul></section> : null}
+        {project.features?.length ? <section><h2>What I built</h2><ul>{project.features.map((feature) => <li key={feature}>{feature}</li>)}</ul></section> : null}
       </div>
+      <nav className="case-section-nav" aria-label="Case study sections">
+        <a href="#overview-title">Overview</a>
+        {project.githubUrl ? <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">Explore source code <Arrow /></a> : null}
+        <Link to="/#work">Browse more projects <Arrow /></Link>
+      </nav>
       {project.meta?.learning ? <section className="case-learning"><p className="kicker">Engineering reflection</p><h2>What I learned</h2><p>{project.meta.learning}</p></section> : null}
     </main>
   )

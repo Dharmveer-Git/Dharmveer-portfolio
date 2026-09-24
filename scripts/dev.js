@@ -3,6 +3,7 @@ import { spawn, spawnSync } from 'node:child_process'
 import { mkdir } from 'node:fs/promises'
 import net from 'node:net'
 import path from 'node:path'
+import { setTimeout as delay } from 'node:timers/promises'
 import { MongoClient } from 'mongodb'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { configureDatabaseDns } from '../server/config/dns.js'
@@ -84,24 +85,7 @@ const services = [
   }],
 ]
 
-const children = services.flatMap((service) => {
-  if (service.running) {
-    console.log(`${service.name} is already running at ${service.url}`)
-    return []
-  }
-  console.log(`Starting ${service.name} at ${service.url}`)
-  return [spawn(process.execPath, service.command, {
-    cwd: rootDirectory,
-    env: service.env,
-    stdio: 'inherit',
-  })]
-})
-
-if (children.length === 0) {
-  console.log('All development services are already running.')
-  process.exit(0)
-}
-
+const children = []
 let stopping = false
 const stop = async (exitCode = 0) => {
   if (stopping) return
@@ -118,18 +102,55 @@ const stop = async (exitCode = 0) => {
   process.exit(exitCode)
 }
 
-for (const child of children) {
-  child.on('error', (error) => {
-    console.error(`Development process failed to start: ${error.message}`)
-    void stop(1)
-  })
-  child.on('exit', (code, signal) => {
-    if (!stopping && code !== 0) {
-      console.error(`Development process exited (${signal || code}).`)
-      void stop(code || 1)
-    }
-  })
-}
-
 process.on('SIGINT', () => { void stop() })
 process.on('SIGTERM', () => { void stop() })
+
+for (const service of services) {
+  if (service.running) {
+    console.log(`${service.name} is already running at ${service.url}`)
+  } else {
+    console.log(`Starting ${service.name} at ${service.url}`)
+    const child = spawn(process.execPath, service.command, {
+      cwd: rootDirectory,
+      env: service.env,
+      stdio: 'inherit',
+    })
+    children.push(child)
+    child.on('error', (error) => {
+      console.error(`Development process failed to start: ${error.message}`)
+      void stop(1)
+    })
+    child.on('exit', (code, signal) => {
+      if (!stopping) {
+        console.error(`Development process exited (${signal || code}).`)
+        void stop(code || 1)
+      }
+    })
+  }
+
+  if (service.name === 'API') {
+    console.log('Waiting for API readiness before starting the frontend...')
+    const deadline = Date.now() + 60_000
+    let ready = false
+    while (!stopping && Date.now() < deadline) {
+      try {
+        const response = await fetch(service.url, { signal: AbortSignal.timeout(1_000) })
+        const body = await response.json()
+        if (response.ok && body.status === 'ok') { ready = true; break }
+      } catch { /* The API does not listen until database initialization succeeds. */ }
+      await delay(250)
+    }
+    if (stopping) break
+    if (!ready) {
+      console.error('API did not become ready within 60 seconds. Check the database connection and API logs above.')
+      await stop(1)
+      break
+    }
+    console.log('API is ready.')
+  }
+}
+
+if (children.length === 0) {
+  console.log('All development services are already running.')
+  process.exit(0)
+}

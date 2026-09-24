@@ -25,7 +25,7 @@ const fallbackSettings = {
   pageTitle: 'Dharmveer Kumar | Full Stack Developer', metaDescription: 'Full Stack Developer specializing in React, Node.js, MongoDB, Java and Spring Boot.', keywords: '', ogImage: '', sections: {},
 }
 
-const navigationOrder = ['#top', '#about', '#experience', '#education', '#skills', '#work', '#certificates', '#contact']
+const navigationOrder = ['#top', '#about', '#work', '#skills', '#experience', '#education', '#certificates', '#contact']
 const navigationSections = {
   '#about': 'about',
   '#skills': 'skills',
@@ -177,7 +177,7 @@ export default function Portfolio() {
         </nav>
         <div className="header-actions">
           <button className="theme-toggle" onClick={() => setTheme((value) => value === 'dark' ? 'light' : 'dark')} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>{theme === 'dark' ? '☀' : '☾'}</button>
-          <a className="header-resume" href="#resume">Resume</a>
+          {settings.resumeUrl ? <a className="header-resume" href="#resume">Resume</a> : null}
           {sectionAvailability.contact ? <a className="available" href="#contact"><i /> {settings.hireMeText}</a> : null}
           <button className="menu-toggle" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen} aria-controls="primary-navigation" aria-label="Toggle navigation"><span /><span /></button>
         </div>
@@ -188,7 +188,6 @@ export default function Portfolio() {
           <div className="profile-orbit has-photo">
             <span>{(profile?.title || 'DK').split(' ').map((word) => word[0]).slice(0, 2).join('')}</span>
             <img key={portrait} src={portrait} alt={`${profile?.title || 'Dharmveer Kumar'} profile`} width="640" height="640" fetchPriority="high" onError={(event) => { event.currentTarget.hidden = true }} />
-            <small>Engineer<br />Designer</small>
           </div>
           <p className="kicker hero-kicker">Portfolio / Software development</p>
           <div className="hero-identity"><span>{profile?.subtitle || 'Full-Stack Developer'}</span></div>
@@ -197,23 +196,22 @@ export default function Portfolio() {
           <div className="hero-bottom">
             <p>{profile?.description || 'Explore my work, experience, and approach to building thoughtful digital products.'}</p>
             <div className="hero-actions">
-              <button className="profile-action" onClick={() => setProfileOpen(true)}>View Profile</button>
               {sectionAvailability.projects ? <a className="primary-action" href="#work">View Projects <Arrow /></a> : null}
-              {settings.resumeUrl ? <a href={settings.resumeUrl} target="_blank" rel="noopener noreferrer">View Resume <Arrow /></a> : null}
-              {settings.resumeUrl ? <a href={settings.resumeUrl} download>Download Resume</a> : null}
-              {sectionAvailability.contact ? <a href="#contact">Contact</a> : null}
+              {sectionAvailability.contact ? <a href="#contact">Contact Me <Arrow /></a> : null}
+            </div>
+            <div className="hero-secondary-actions">
+              <button className="profile-action" onClick={() => setProfileOpen(true)}>Read full profile <Arrow /></button>
+              {settings.resumeUrl ? <a href={settings.resumeUrl} download>Download resume <Arrow /></a> : null}
             </div>
           </div>
           <SocialLinks items={heroSocials} className="hero-socials" />
           <div className="stamp" aria-hidden="true"><span>DESIGN</span><b>×</b><span>CODE</span></div>
         </section>
 
-        <aside className="proof-strip" aria-label="Core capabilities">
-          <p>Built for real-world delivery</p>
-          <div><strong>Frontend</strong><span>React · Responsive UI</span></div>
-          <div><strong>Backend</strong><span>Node · Express · REST</span></div>
-          <div><strong>Data & security</strong><span>MongoDB · JWT · APIs</span></div>
-        </aside>
+        {sectionAvailability.skills && groupedSkills.length > 0 ? <aside className="proof-strip" aria-label="Technical focus">
+          <p>Technical focus</p>
+          {groupedSkills.slice(0, 3).map(([category, skills]) => <div key={category}><strong>{category}</strong><span>{skills.slice(0, 3).map((skill) => skill.title).join(' / ')}</span></div>)}
+        </aside> : null}
 
         <section className="about section" id="about" hidden={!sectionAvailability.about}>
           <div className="section-head"><p className="kicker">01 / About me</p><h2>Engineer’s mind.<br />Designer’s eye.</h2></div>
@@ -221,35 +219,39 @@ export default function Portfolio() {
             <div className="about-copy">
               <p className="lead">{about?.title || 'Strong engineering should feel simple on the other side.'}</p>
               <p>{about?.description || 'I work across the stack—from accessible React interfaces to secure Express APIs and MongoDB data models. My focus is maintainable code, thoughtful UX, and products teams can confidently build on.'}</p>
-              <div className="facts"><div><span>Education</span><strong>{content.education[0]?.title || 'B.Tech CSE'}</strong></div><div><span>Focus</span><strong>MERN / Backend</strong></div><div><span>Location</span><strong>{profile?.location || 'India'}</strong></div><div><span>Career goal</span><strong>Software Developer</strong></div></div>
+              <div className="facts">
+                {sectionAvailability.education && content.education[0]?.title ? <div><span>Education</span><strong>{content.education[0].title}</strong></div> : null}
+                {profile?.subtitle ? <div><span>Specialization</span><strong>{profile.subtitle}</strong></div> : null}
+                {profile?.location ? <div><span>Location</span><strong>{profile.location}</strong></div> : null}
+              </div>
             </div>
           </div>
         </section>
 
+        <section className="work section" id="work" hidden={!sectionAvailability.projects}>
+          <div className="section-head"><p className="kicker">02 / Selected work</p><h2>Projects & case studies.</h2></div>
+          {content.projects.length === 0 ? <p className="section-empty">{apiOnline ? 'Project case studies will appear here once published.' : 'Projects are temporarily unavailable. Please try again shortly.'}</p> : null}
+          <div className="project-list">
+            {content.projects.map((project, index) => <ProjectCard key={project._id} project={project} index={index} />)}
+          </div>
+        </section>
+
+        <section className="skills-section section" id="skills" hidden={!sectionAvailability.skills}>
+          <div className="section-head"><p className="kicker">03 / Skills</p><h2>Technical expertise.</h2></div>
+          {groupedSkills.length === 0 ? <p className="section-empty">Skills will appear here once published.</p> : null}
+          <div className="skill-categories">{groupedSkills.map(([category, skills]) => <article className="skill-category" key={category}><div><span>{String(skillCategories.findIndex(([name]) => name === category) + 1).padStart(2, '0')}</span><h3>{category}</h3></div><ul>{skills.map((skill) => <li key={skill._id}>{skill.title}</li>)}</ul></article>)}</div>
+        </section>
+
         <section className="experience section" id="experience" hidden={!sectionAvailability.experience}>
-          <div className="section-head"><p className="kicker">02 / Experience</p><h2>A practical path.</h2></div>
+          <div className="section-head"><p className="kicker">04 / Experience</p><h2>Professional experience.</h2></div>
           {content.experience.length === 0 ? <p className="section-empty">Experience details will appear here once published.</p> : null}
           <div className="timeline">{content.experience.map((item) => <article key={item._id}><span>{item.startDate}—{item.endDate}</span><div><strong>{item.title}</strong><small>{item.subtitle}</small></div><p>{item.description}<br />{item.tags?.join(' · ')}</p></article>)}</div>
         </section>
 
         <section className="education section" id="education" hidden={!sectionAvailability.education}>
-          <div className="section-head"><p className="kicker">03 / Education</p><h2>Built on fundamentals.</h2></div>
+          <div className="section-head"><p className="kicker">05 / Education</p><h2>Education & foundations.</h2></div>
           {content.education.length === 0 ? <p className="section-empty">Education details will appear here once published.</p> : null}
           <div className="education-grid">{content.education.map((item) => <article key={item._id}><span>{[item.startDate, item.endDate].filter(Boolean).join(' – ')}</span><h3>{item.title}</h3><p>{item.subtitle}</p>{item.description ? <p>{item.description}</p> : null}</article>)}</div>
-        </section>
-
-        <section className="skills-section section" id="skills" hidden={!sectionAvailability.skills}>
-          <div className="section-head"><p className="kicker">04 / Skills</p><h2>Tools I use to ship.</h2></div>
-          {groupedSkills.length === 0 ? <p className="section-empty">Skills will appear here once published.</p> : null}
-          <div className="skill-categories">{groupedSkills.map(([category, skills]) => <article className="skill-category" key={category}><div><span>{String(skillCategories.findIndex(([name]) => name === category) + 1).padStart(2, '0')}</span><h3>{category}</h3></div><ul>{skills.map((skill) => <li key={skill._id}>{skill.title}</li>)}</ul></article>)}</div>
-        </section>
-
-        <section className="work section" id="work" hidden={!sectionAvailability.projects}>
-          <div className="section-head"><p className="kicker">05 / Selected work</p><h2>Featured projects.</h2></div>
-          {content.projects.length === 0 ? <p className="section-empty">{apiOnline ? 'Project case studies will appear here once published.' : 'Projects are temporarily unavailable. Please try again shortly.'}</p> : null}
-          <div className="project-list">
-            {content.projects.map((project, index) => <ProjectCard key={project._id} project={project} index={index} />)}
-          </div>
         </section>
 
         <section className="certificates section" id="certificates" hidden={!sectionAvailability.certificates} aria-labelledby="certificates-title">
@@ -278,7 +280,7 @@ export default function Portfolio() {
         </section> : null}
 
         <section className="contact" id="contact" hidden={!sectionAvailability.contact}>
-          <div className="section-head"><p className="kicker">08 / Contact</p><h2>Have something good in mind?</h2></div>
+          <div className="section-head"><p className="kicker">08 / Contact</p><h2>Let's discuss your next project.</h2></div>
           <div className="contact-grid">
             <aside className="contact-profile" aria-label="Developer contact details">
               <div className="contact-profile-head">
@@ -290,14 +292,15 @@ export default function Portfolio() {
                 {footerEmail ? <a href={footerEmail.url}><SocialIcon item={footerEmail} size={28} /><strong>{footerEmail.url.replace('mailto:', '')}</strong></a> : null}
                 {contactProfileLinks.filter((item) => item.title.toLowerCase() !== 'email').map((item) => <a key={item._id} href={item.url} target="_blank" rel="noopener noreferrer"><SocialIcon item={item} size={28} /><strong>{item.title}</strong></a>)}
               </div>
-              <div className="contact-promise"><span>Typical response</span><strong>Within two working days</strong></div>
+              <div className="contact-promise"><span>Start a conversation</span><strong>Projects, roles & collaboration</strong></div>
               {!apiOnline ? <p className="api-warning">The contact form is temporarily unavailable. Please use one of the contact links above.</p> : null}
             </aside>
-            <form className="contact-form" onSubmit={submitMessage}>
-              <div><label>Name<input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required maxLength="80" /></label><label>Email<input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></label></div>
-              <label>Subject<input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} required maxLength="160" /></label>
-              <label>Message<textarea rows="5" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} required maxLength="3000" /></label>
-              {formStatus.message ? <p className={formStatus.error ? 'form-error' : 'form-success'} role="status">{formStatus.message}</p> : null}
+            <form className="contact-form" onSubmit={submitMessage} aria-busy={formStatus.loading}>
+              <p className="form-hint">All fields are required.</p>
+              <div><label>Full name<input name="name" autoComplete="name" placeholder="Your full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required maxLength="80" /></label><label>Email address<input name="email" autoComplete="email" placeholder="you@example.com" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></label></div>
+              <label>Subject<input name="subject" placeholder="What would you like to discuss?" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} required maxLength="160" /></label>
+              <label>Message<textarea name="message" placeholder="Tell me about your project, goals, or opportunity." rows="5" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} required maxLength="3000" /></label>
+              {formStatus.message ? <p className={formStatus.error ? 'form-error' : 'form-success'} role={formStatus.error ? 'alert' : 'status'}>{formStatus.message}</p> : null}
               <button disabled={formStatus.loading || !apiOnline}>{formStatus.loading ? 'Sending…' : 'Send message'} <Arrow /></button>
             </form>
           </div>
