@@ -4,6 +4,20 @@ Deploy this as a Node.js / Express application. The Express server serves both
 the API and the React build on the same domain. Upload the complete application
 archive, not just the frontend build.
 
+## Create the upload ZIP on Windows
+
+Run `powershell -ExecutionPolicy Bypass -File scripts/package-hostinger.ps1`
+from this project. It builds the frontend and creates
+`../portfolio-hostinger-ready.zip`, with `package.json`, `package-lock.json`,
+and `server.js` directly at the ZIP root. It excludes the private `.env`,
+Git metadata, node_modules, and local database files.
+
+Upload this ZIP unchanged. Leave the deployment root empty or use `.`;
+do not select `client` because that folder has no package.json.
+For GitHub deployment, select `Dharmveer-Git/Dharmveer-portfolio`, branch
+`main`, and the repository root. For this domain, set
+`CLIENT_URL=https://dharmveerportfilio.org` in the hosting environment.
+
 ## Build and start
 
 | Setting | Value |
